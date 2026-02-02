@@ -1,6 +1,6 @@
 import ProfilTemplate from "../../src/templates/ProfilTemplate";
 
-export default  function Profil() {
+export default  function profil() {
     return (
         <ProfilTemplate />
     )

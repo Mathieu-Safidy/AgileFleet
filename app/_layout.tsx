@@ -15,6 +15,7 @@ export default function RootLayout() {
                 <Stack screenOptions={{ headerShown: false }}>
                     {/* Ce Stack va gérer la bascule entre le groupe (tabs) et les autres pages */}
                     <Stack.Screen name="(home)" options={{ headerShown: false }} />
+                    <Stack.Screen name="parametre" options={{ headerShown: false }} />
                 </Stack>
             </SafeAreaView>
             {/* </View> */}

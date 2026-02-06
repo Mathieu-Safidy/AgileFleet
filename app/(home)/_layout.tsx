@@ -6,12 +6,16 @@ import NavBar from "../../src/components/organismes/NavBar/NavBar";
 import SideBar from "../../src/components/organismes/SideBar/SideBar";
 import BottomBar from "../../src/components/organismes/BottomBar/BottomBar";
 import { Notification } from "../../src/type/notifications";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { hydrateAuth } from "../../src/slices/authSlice";
 
 export default function MainLayout() {
     const router = useRouter();
     const pathname = usePathname(); // Pour détecter la page actuelle
     const [isOpen, setOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(2);
+    const dispatch = useDispatch();
     const [notifications, setNotifications] = useState<Notification[]>([
         { id: '1', type: 'alert', title: 'Maintenance', description: 'Vidange prévue pour la Peugeot 205 dans 500km.', time: '10 min', isRead: false },
         { id: '2', type: 'success', title: 'Plein effectué', description: 'Le véhicule 1234 AB 56 a été ravitaillé.', time: '2h', isRead: true },
@@ -19,11 +23,11 @@ export default function MainLayout() {
     ]);
 
     const menuBottom = [
-        { title: "Véhicule", icon: Car, href: "/",actionType: "tabs" },
+        { title: "Véhicule", icon: Car, href: "/", actionType: "tabs" },
         // { title: "Gps", icon: Locate, href: "/gps",actionType: "tabs" },
-        { title: "Board", icon: Gauge, href: "/home",actionType: "tabs" }, // Page d'accueil (index.tsx)
-        { title: "Profil", icon: User, href: "/profil",actionType: "tabs" },
-        { title: "Rapport", icon: ChartBarBig, href: "/rapport",actionType: "page" },
+        { title: "Board", icon: Gauge, href: "/home", actionType: "tabs" }, // Page d'accueil (index.tsx)
+        { title: "Profil", icon: User, href: "/profil", actionType: "tabs" },
+        { title: "Rapport", icon: ChartBarBig, href: "/rapport", actionType: "page" },
     ];
 
     const menuSide = [
@@ -34,7 +38,29 @@ export default function MainLayout() {
         { title: "Rapport", icon: ChartBarBig, action: () => router.push("/rapport") },
     ];
 
-    
+
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        const checkSession = async () => {
+            try {
+                const user = await AsyncStorage.getItem("user");
+
+                if (!user) {
+                    router.replace("/form/login");
+                    return;
+                }
+            } catch (error) {
+                console.log("Erreur AsyncStorage:", error);
+                router.replace("/form/login");
+                return;
+            } finally {
+                setLoading(false); // ✅ AU BON ENDROIT
+            }
+        };
+
+        checkSession();
+    }, []);
+
     // Met à jour l'index actif automatiquement quand l'URL change
     useEffect(() => {
         const index = menuBottom.findIndex(item => item.href === pathname);
@@ -55,10 +81,25 @@ export default function MainLayout() {
         }
     }
 
+    useEffect(() => {
+        const bootstrapAsync = async () => {
+            const userSession: any = await AsyncStorage.getItem('user');
+            if (userSession) {
+                dispatch(hydrateAuth(JSON.parse(userSession)));
+                console.log('====================================');
+                console.log('Init user', userSession);
+                console.log('====================================');
+                return;
+            }
+        }
+        bootstrapAsync();
+    }, [])
+
     // function onChangePage(index: number) {
     //     return <Redirect href={menuBottom[index].href} />
     // }
-    return (
+    if (loading) return null;
+    if (!loading) return (
         <View className="flex-1 bg-white">
             {/* NavBar persistante */}
             <NavBar onClickMenu={() => setOpen(true)} />
@@ -69,7 +110,7 @@ export default function MainLayout() {
             </View>
 
             {/* SideBar (Drawer) */}
-            
+
 
             {/* BottomBar persistante */}
             <BottomBar

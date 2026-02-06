@@ -7,9 +7,10 @@ interface SmartTimePickerProps {
     label: string;
     value: Date;
     onChange: (date: Date) => void;
+    alertVisible?: boolean;
 }
 
-export default function SmartTimePicker({ label, value, onChange }: SmartTimePickerProps) {
+export default function SmartTimePicker({ label, value, onChange , alertVisible }: SmartTimePickerProps) {
     const [show, setShow] = useState(false);
 
     const handleTimeChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -29,6 +30,8 @@ export default function SmartTimePicker({ label, value, onChange }: SmartTimePic
         hour12: false
     });
 
+     const color = (show && !alertVisible) ? "#22c55e" : alertVisible ? "#ef4444" : "#a1a1aa";
+
     return (
         <View className="mt-4">
             <Text className="text-zinc-400 text-[10px] font-black uppercase tracking-widest mb-2 ml-1">
@@ -38,12 +41,11 @@ export default function SmartTimePicker({ label, value, onChange }: SmartTimePic
             <Pressable
                 onPress={() => setShow(true)}
                 // On change la bordure dynamiquement si 'show' est vrai
-                className={`flex-row items-center bg-white border p-4 rounded-2xl shadow-sm active:bg-zinc-50 ${
-                    show ? 'border-purple-500' : 'border-zinc-100'
-                }`}
+                className={`flex-row items-center bg-white border p-4 rounded-2xl shadow-sm active:bg-zinc-50 
+                    ${ show ? 'border-purple-500' : 'border-zinc-100' } ${alertVisible ? 'border-red-500' : ''}` }
             >
                 <View className={`p-2 rounded-xl mr-3 ${show ? 'bg-purple-100' : 'bg-zinc-50'}`}>
-                    <Clock size={18} color={show ? "#7c3aed" : "#a1a1aa"} />
+                    <Clock size={18} color={color} />
                 </View>
                 
                 <Text className={`font-bold text-lg ${show ? 'text-purple-600' : 'text-zinc-900'}`}>

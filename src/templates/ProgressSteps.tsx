@@ -20,7 +20,7 @@ function ProgresStepTemplate() {
     let editModeInfo = true;
 
     return (
-        <View style={{ flex: 1 }} className="bg-white p-1 rounded-lg shadow-lg">
+        <View style={{ flex: 1 }} className="bg-white  p-1 rounded-lg shadow-lg">
             <ProgressSteps activeStep={currentStep}>
                 <ProgressStep
                     label="Step 1"
@@ -31,7 +31,7 @@ function ProgresStepTemplate() {
                     onNext={onNextStep}
                     onPrevious={onPreviousStep}
                 >
-                    <View className="bg-white rounded-3xl p-6 shadow-sm border border-zinc-100">
+                    <View className="bg-white rounded-3xl p-6 shadow-sm border border-zinc-100">    
                         {/* Header du bloc */}
                         <View className="flex flex-row justify-between items-center mb-6">
                             <View className="flex-row items-center">

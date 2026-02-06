@@ -27,7 +27,7 @@ export default function NavBar({ onClickMenu }: NavBarProps) {
         >
             <Image
                 source={logo}
-                className="w-28 h-10"
+                className="w-36 h-10"
                 resizeMode="contain"
             />
 

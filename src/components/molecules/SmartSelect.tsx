@@ -12,6 +12,9 @@ type InputFieldProps = {
 
 
 export default function SmartSelect({ selectedValue, onValueChange, selectable, data, placeholder , label }: InputFieldProps) {
+    // console.log('============selected value composant===============');
+    // console.log(selectedValue);
+    // console.log('====================================');
     return (
         <View className="mt-4">
             {label && (

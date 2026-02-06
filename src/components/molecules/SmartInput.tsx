@@ -11,23 +11,38 @@ interface SmartInputProps {
     keyboardType?: any;
     editMode?: boolean;
     // Ajout des props pour le mode textarea
-    isTextArea?: boolean; 
+    isTextArea?: boolean;
     rows?: number;
+    required?: boolean;
+    valid?: (valeur: boolean) => void;
+    isInvalid?: boolean;
 }
 
-export default function SmartInput({ 
-    label, 
-    icon: Icon, 
-    placeholder, 
-    keyboardType, 
+export default function SmartInput({
+    label,
+    icon: Icon,
+    placeholder,
+    keyboardType,
     editMode = true,
+    value,
     onChangeText,
     isTextArea = false, // Par défaut, c'est un input normal
-    rows = 4 
+    rows = 4,
+    required = false,
+    isInvalid = false,
+    valid,
 }: SmartInputProps) {
     const [focusedField, setFocusedField] = useState<string | null>(null);
+    const [localAlert, setLocalAlert] = useState(false);
+    const alertVisible = localAlert || isInvalid;
+    const handleBlur = () => {
+        const isEmpty = required && !value;
+        setLocalAlert(isEmpty);
+        valid && valid(!isEmpty);
+        setFocusedField(null);
+    }
     const isCurrentFocused = focusedField === placeholder;
-
+    const color = (isCurrentFocused && !alertVisible) ? "#22c55e" : alertVisible ? "#ef4444" : "#a1a1aa";
     return (
         <View className="mt-4">
             {label && (
@@ -37,13 +52,12 @@ export default function SmartInput({
             )}
 
             <View
-                className={`flex-row bg-white border-2 rounded-2xl px-4 ${
-                    isCurrentFocused ? 'border-green-500' : 'border-zinc-100'
-                } ${isTextArea ? 'py-3 items-start' : 'h-14 items-center'}`}
+                className={`flex-row bg-white border-2 rounded-2xl px-4 ${isCurrentFocused ? 'border-green-500' : 'border-zinc-100'
+                    } ${isTextArea ? 'py-3 items-start' : 'h-14 items-center'} ${alertVisible && required ? 'border-red-500' : ''}`}
             >
                 {/* On ajuste la position de l'icône si c'est un textarea */}
                 <View className={isTextArea ? "mt-1" : ""}>
-                    <Icon size={20} color={isCurrentFocused ? "#22c55e" : "#a1a1aa"} />
+                    <Icon size={20} color={color} />
                 </View>
 
                 <TextInput
@@ -53,9 +67,10 @@ export default function SmartInput({
                     placeholderTextColor="#a1a1aa"
                     keyboardType={keyboardType}
                     onFocus={() => setFocusedField(placeholder)}
-                    onBlur={() => setFocusedField(null)}
+                    onBlur={handleBlur}
                     editable={editMode}
                     onChangeText={onChangeText}
+                    value={value}
                     // Propriétés spécifiques au TextArea
                     multiline={isTextArea}
                     numberOfLines={isTextArea ? rows : 1}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { FileUp, X, FileText, FileImage, Paperclip } from 'lucide-react-native';
@@ -6,18 +6,25 @@ import { FileUp, X, FileText, FileImage, Paperclip } from 'lucide-react-native';
 interface SmartFilePickerProps {
     label: string;
     onFileSelect: (file: DocumentPicker.DocumentPickerAsset | null) => void;
+    initialValue?: DocumentPicker.DocumentPickerAsset | null;
 }
 
-export default function SmartFilePicker({ label, onFileSelect }: SmartFilePickerProps) {
-    const [file, setFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
+export default function SmartFilePicker({ label, onFileSelect, initialValue }: SmartFilePickerProps) {
+    const [file, setFile] = useState<DocumentPicker.DocumentPickerAsset | null>(initialValue || null);
+
+    useEffect(() => {
+        if (initialValue) {
+            setFile(initialValue);
+        }
+    }, [initialValue]);
 
     const pickDocument = async () => {
         try {
             const result = await DocumentPicker.getDocumentAsync({
                 type: [
-                    'image/png', 
-                    'image/jpeg', 
-                    'application/pdf', 
+                    'image/png',
+                    'image/jpeg',
+                    'application/pdf',
                     'application/msword',
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                 ],
@@ -75,7 +82,7 @@ export default function SmartFilePicker({ label, onFileSelect }: SmartFilePicker
                     <View className="bg-zinc-50 p-3 rounded-xl">
                         {getFileIcon(file.mimeType)}
                     </View>
-                    
+
                     <View className="flex-1 ml-3">
                         <Text className="text-zinc-900 font-bold text-sm" numberOfLines={1}>
                             {file.name}
@@ -85,7 +92,7 @@ export default function SmartFilePicker({ label, onFileSelect }: SmartFilePicker
                         </Text>
                     </View>
 
-                    <Pressable 
+                    <Pressable
                         onPress={removeFile}
                         className="bg-red-50 p-2 rounded-full"
                     >

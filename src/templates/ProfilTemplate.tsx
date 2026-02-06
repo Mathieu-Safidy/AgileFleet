@@ -1,11 +1,33 @@
 import { Image, ScrollView, Text, View, TouchableOpacity } from "react-native";
-import { Camera, Settings, User, Mail, ShieldCheck, LucideIcon, Phone, Car } from "lucide-react-native";
+import { Camera, Settings, User, Mail, ShieldCheck, LucideIcon, Phone, Car, LogOut } from "lucide-react-native";
 import logo from "../../assets/agilfleet.png"; // Note: Remplace par une photo de profil si besoin
 import ProfileItem from "../components/molecules/ProfileItem";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
 
 export default function ProfilTemplate() {
     const router = useRouter();
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadUser = async () => {
+            try {
+                const storedUser = await AsyncStorage.getItem("user");
+                if (storedUser) {
+                    setUser(JSON.parse(storedUser));
+                }
+            } catch (error) {
+                console.log("Erreur chargement user", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadUser();
+    }, []);
+
     return (
         <ScrollView showsVerticalScrollIndicator={false} className="bg-slate-50">
             {/* Conteneur Carte Profil */}
@@ -15,7 +37,7 @@ export default function ProfilTemplate() {
                 <View className="relative">
                     <View className="rounded-full border-4 border-green-50 w-32 h-32 items-center justify-center overflow-hidden bg-slate-100">
                         <Image
-                            source={logo}
+                            source={{ uri: user?.photoProfil || Image.resolveAssetSource(logo).uri }}
                             className="w-full h-full"
                             resizeMode="cover"
                         />
@@ -27,17 +49,17 @@ export default function ProfilTemplate() {
                 </View>
 
                 {/* Infos Utilisateur */}
-                <Text className="text-2xl font-black text-zinc-900 mt-5">Jean Dupont</Text>
-                <Text className="text-zinc-500 font-medium">Chauffeur</Text>
+                <Text className="text-2xl font-black text-zinc-900 mt-5">{user?.nom || "Jean Dupont"}</Text>
+                <Text className="text-zinc-500 font-medium">{"Chauffeur"}</Text>
 
                 <View className="flex-col mt-6 gap-4">
                     <View className="flex flex-row items-center px-4 py-2 bg-slate-50 rounded-2xl">
                         <Mail size={20} color="#71717a" className="" />
-                        <Text className="ms-2 text-lg text-zinc-400 font-bold">jeandupont@gmail.com</Text>
+                        <Text className="ms-2 text-lg text-zinc-400 font-bold">{user?.email || "jeandupont@gmail.com"}</Text>
                     </View>
                     <View className="flex flex-row w-fit items-center px-4 py-2 bg-slate-50 rounded-2xl">
                         <Phone size={20} color="#71717a" className="" />
-                        <Text className="ms-6 text-md text-zinc-400 uppercase font-bold">+261 38 33 594 99</Text>
+                        <Text className="ms-6 text-md text-zinc-400 uppercase font-bold">{user?.phone || "+261 38 33 594 99"}</Text>
                     </View>
                 </View>
             </View>
@@ -71,7 +93,7 @@ export default function ProfilTemplate() {
                             <Text className="text-zinc-900 font-black text-lg">51 444 km</Text>
                         </View>
 
-                        <View className="flex p-3 min-w-[48%] max-w-[48%] bg-slate-50 rounded-2xl border border-slate-100">
+                        <View className="flex p-3 min-w-[48%] max-w-[48%] bg-slate-50 rconst user = await AsyncStorage.getItem('user');ounded-2xl border border-slate-100">
                             <Text className="text-zinc-500 text-[10px] font-bold uppercase tracking-tight">Carburant</Text>
                             <View className="flex-row items-baseline">
                                 <Text className="text-zinc-900 font-black text-lg">Essence</Text>
@@ -86,7 +108,7 @@ export default function ProfilTemplate() {
                                 {/* <Text className="text-zinc-500 font-bold text-xs ml-0.5">%</Text> */}
                             </View>
                         </View>
-                        
+
                         <View className="flex p-3 min-w-[48%] max-w-[48%] bg-slate-50 rounded-2xl border border-slate-100">
                             <Text className="text-zinc-500 text-[10px] font-bold uppercase tracking-tight">Prochain controle</Text>
                             <View className="flex-row items-baseline">
@@ -107,7 +129,8 @@ export default function ProfilTemplate() {
                     <ProfileItem icon={User} label="Informations personnelles" action={() => { router.push("/parametre/info") }} />
                     <ProfileItem icon={Mail} label="Contact Support" />
                     <ProfileItem icon={ShieldCheck} label="Sécurité & Compte" />
-                    <ProfileItem icon={Settings} label="Préférences" isLast />
+                    <ProfileItem icon={Settings} label="Préférences" />
+                    <ProfileItem icon={LogOut} label="Se deconnecter" isLast action={async () => { await AsyncStorage.clear(),router.push("/form/login") }} />
                 </View>
             </View>
         </ScrollView>
